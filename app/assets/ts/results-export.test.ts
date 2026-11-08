@@ -39,6 +39,15 @@ describe("results-export", () => {
       expect(escapeCSVField("Line 1\nLine 2")).toBe('"Line 1\nLine 2"');
       expect(escapeCSVField("Line 1\r\nLine 2")).toBe('"Line 1\r\nLine 2"');
     });
+
+    it("neutralizes formula execution prefixes (=, +, -, @, tab, cr)", () => {
+      expect(escapeCSVField("=cmd|' /C calc'!A0")).toBe("'=cmd|' /C calc'!A0");
+      expect(escapeCSVField("+SUM(1+1)")).toBe("'+SUM(1+1)");
+      expect(escapeCSVField("-10% discount")).toBe("'-10% discount");
+      expect(escapeCSVField("@SUM(A1:A5)")).toBe("'@SUM(A1:A5)");
+      expect(escapeCSVField("\tformula")).toBe("'\tformula");
+      expect(escapeCSVField("=SUM(A1, B1)")).toBe('"\'=SUM(A1, B1)"');
+    });
   });
 
   describe("formatResultsAsCSV", () => {
